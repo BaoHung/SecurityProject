@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 typedef unsigned char BYTE;
 void aes_encrypt(BYTE *cipher, BYTE *message, BYTE *key);
@@ -88,7 +89,7 @@ int main(int argc, char **argv)
             for (i = 0; i < 16; i++)
             {
                 sprintf(MAC, "%02x", *(fileContent - 16 + i));
-                if (MAC[0] != argv[2][i * 2] || MAC[1] != argv[2][i * 2 + 1])
+                if (tolower(MAC[0]) != tolower(argv[2][i * 2]) || tolower(MAC[1]) != tolower(argv[2][i * 2 + 1]))
                 {
                     isMACgood = 0;
                     break;
