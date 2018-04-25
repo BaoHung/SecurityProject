@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "time.h"
 #include "gmp.h"
+#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 
@@ -14,7 +15,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        int outputFile = open("output.txt", O_RDWR | O_CREAT | O_APPEND, 0600);
+        int outputFile = open("key.txt", O_RDWR | O_CREAT, S_IRUSR | S_IWUSR);
         if (outputFile)
         {
             dup2(outputFile, 1);
@@ -62,13 +63,14 @@ int main(int argc, char **argv)
 
         gmp_printf("e = 0x%ZX\n", z_e);
         gmp_printf("n = 0x%ZX\n", z_n);
-        gmp_printf("d = 0x%ZX\n", z_d);
+        gmp_printf("d = 0x%ZX", z_d);
 
         mpz_clears(z_p, z_q, z_powerK, z_phi, z_d, z_e, z_n, NULL);
         gmp_randclear(prng);
 
         if (outputFile)
         {
+            fflush(stdout);
             close(outputFile);
         }
         return 0;
