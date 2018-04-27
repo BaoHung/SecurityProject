@@ -1,0 +1,13 @@
+CRT changes:
+
+RSA: 
+    Public: e, n
+    Private: d
+CRT:
+    Public: e, n
+    Private: p, q, dp, dq, Ip    
+
+Need to change:
+    Key generation
+    Decryption
+    (Same public key => Encryption is the same)

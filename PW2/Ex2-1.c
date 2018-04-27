@@ -15,7 +15,7 @@ int main(int argc, char **argv)
     }
     else
     {
-        int outputFile = open("key.txt", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+        int outputFile = open("key-crt.txt", O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
         if (outputFile)
         {
             dup2(outputFile, 1);
@@ -24,15 +24,15 @@ int main(int argc, char **argv)
         int k = atoi(argv[1]), e = atoi(argv[2]);
 
         gmp_randstate_t prng;
-        mpz_t z_p, z_q, z_p_1, z_q_1, z_powerK, z_phi, z_d, z_e, z_n, gcd;
+        mpz_t z_p, z_q, z_p_1, z_q_1, z_powerK, z_phi, z_d, z_e, z_n, gcd, z_dp, z_dq, z_Ip;
 
         gmp_randinit_default(prng);
         gmp_randseed_ui(prng, time(NULL));
-        mpz_inits(z_p, z_q, z_p_1, z_q_1, z_powerK, z_phi, z_d, z_e, z_n, gcd, NULL);
+        mpz_inits(z_p, z_q, z_p_1, z_q_1, z_powerK, z_phi, z_d, z_e, z_n, gcd, z_dp, z_dq, z_Ip, NULL);
         mpz_set_ui(z_e, e);
         mpz_ui_pow_ui(z_powerK, 2, k - 1);
 
-        int isPrime = 0, isInvertible = 0;
+        int isPrime = 0;
         while (!isPrime)
         {
             mpz_rrandomb(z_p, prng, k / 2 - 1);
@@ -41,7 +41,7 @@ int main(int argc, char **argv)
         }
 
         isPrime = 0;
-        while (!isPrime || mpz_cmp(z_p, z_q) == 0 || !isInvertible)
+        while (!isPrime || mpz_cmp(z_p, z_q) == 0)
         { // Check if e mod phi(n) exist
             mpz_rrandomb(z_q, prng, k / 2 - 1);
             mpz_add(z_q, z_q, z_powerK);
@@ -58,13 +58,24 @@ int main(int argc, char **argv)
                 continue;
 
             mpz_mul(z_phi, z_p_1, z_q_1);
-            isInvertible = mpz_invert(z_d, z_e, z_phi);
+            if (!mpz_invert(z_d, z_e, z_phi))
+                continue;
+            if (!mpz_invert(z_dp, z_e, z_p_1))
+                continue;
+            if (!mpz_invert(z_dq, z_e, z_q_1))
+                continue;
+            if (!mpz_invert(z_Ip, z_p, z_q))
+                continue;
         }
         mpz_mul(z_n, z_p, z_q);
 
         gmp_printf("e = 0x%ZX\n", z_e);
         gmp_printf("n = 0x%ZX\n", z_n);
-        gmp_printf("d = 0x%ZX", z_d);
+        gmp_printf("p = 0x%ZX\n", z_p);
+        gmp_printf("q = 0x%ZX\n", z_q);
+        gmp_printf("dp = 0x%ZX\n", z_dp);
+        gmp_printf("dq = 0x%ZX\n", z_dq);
+        gmp_printf("Ip = 0x%ZX\n", z_Ip);
 
         mpz_clears(z_p, z_q, z_powerK, z_phi, z_d, z_e, z_n, NULL);
         gmp_randclear(prng);
