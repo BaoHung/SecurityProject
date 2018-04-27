@@ -6,10 +6,18 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-void encrypt_rsa(mpz_t *c, mpz_t m, mpz_t n, mpz_t e)
+#define STR_BASE 62
+
+void encrypt_rsa(mpz_t c, const mpz_t m, const mpz_t n, const mpz_t e)
 {
-    printf("Encrypting message.\n");
-    mpz_set_d(*c, 500);
+    printf("Encrypting message...\n");
+    mpz_powm(c, m, e, n);
+}
+
+void decrypt_rsa(mpz_t m, const mpz_t c, const mpz_t n, const mpz_t d)
+{
+    printf("Decrypting message...\n");
+    mpz_powm(m, c, d, n);
 }
 
 int main(int argc, char **argv)
@@ -22,14 +30,9 @@ int main(int argc, char **argv)
     else
     {
         char *key, *value;
-        mpz_t *cypher;
-        cypher = malloc(sizeof(mpz_t));
-        mpz_t z_d, z_e, z_n, z_m;
-        mpz_inits(*cypher, z_d, z_e, z_n, z_m, NULL);
-        mpz_set_str(z_m, argv[1], 62);
-        // char message[200];
-        // mpz_get_str(message, 62, z_m);
-        // printf("Message: %s\n", message);
+        mpz_t z_d, z_e, z_n, z_m, cypher, decrypted;
+        mpz_inits(cypher, decrypted, z_d, z_e, z_n, z_m, NULL);
+        mpz_set_str(z_m, argv[1], STR_BASE);
 
         FILE *inputFile = fopen("key.txt", "rb");
         if (inputFile)
@@ -38,9 +41,6 @@ int main(int argc, char **argv)
 
             while (fscanf(inputFile, "%m[^=]=%ms\n", &key, &value) == 2)
             {
-                // printf("Key: %s\n", key);
-                // printf("Value: %s\n", value);
-
                 switch (key[0])
                 {
                 case 'e':
@@ -65,7 +65,9 @@ int main(int argc, char **argv)
         }
 
         encrypt_rsa(cypher, z_m, z_n, z_e);
-        gmp_printf("GMP cypher=%Zd\n", cypher);
+        printf("Cypher: %s\n", mpz_get_str(NULL, STR_BASE, cypher));
+        decrypt_rsa(decrypted, cypher, z_n, z_d);
+        printf("Decrypted: %s\n", mpz_get_str(NULL, STR_BASE, decrypted));
 
         return 0;
     }
