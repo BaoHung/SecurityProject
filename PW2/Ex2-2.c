@@ -22,7 +22,7 @@ void decrypt_rsa(mpz_t m, const mpz_t c, const mpz_t n, const mpz_t p, const mpz
     mpz_inits(mp, mq, temp, NULL);
     mpz_powm(mp, c, dp, p);
     mpz_powm(mq, c, dq, q);
-    mpz_sub(temp, mp, mq);   // temp = mp - mq;
+    mpz_sub(temp, mq, mp);   // temp = mq - mp;
     mpz_mul(temp, temp, Ip); // temp *= Ip;
     mpz_mod(temp, temp, q);  // temp %= q;
     mpz_mul(temp, temp, p);  // temp *= p;
