@@ -83,7 +83,7 @@ int main(int argc, char **argv)
         printf("\n==============\nMAC: ");
         for (i = 0; i < 16; i++)
         {
-            printf("%02x ", *(fileContent - 16 + i));
+            printf("%02x", *(fileContent - 16 + i));
         }
     }
     printf("\nExit\n");
