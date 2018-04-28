@@ -8,6 +8,9 @@ CRT:
     Private: p, q, dp, dq, Ip    
 
 Need to change:
-    Key generation
+    Private Key generation
     Decryption
-    (Same public key => Encryption is the same)
+    Signing
+    
+    Same public key => Encryption is the same
+    Different set of private key => Decryption is different
